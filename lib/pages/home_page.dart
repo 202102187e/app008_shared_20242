@@ -1,15 +1,42 @@
 import 'package:app008_shared_20242/widgets/my_drawer_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  //const HomePage({super.key});
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   bool isDarkMode = false;
-
   int gender = 1;
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+
+  saveSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("fullName", _fullNameController.text);
+    prefs.setString("address", _addressController.text);
+    prefs.setBool("darkMode", isDarkMode);
+    prefs.setInt("gender", gender);
+
+    print("Guardando datos en Shared Preferences");
+  }
+
+  getSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String fullName = prefs.getString("fullName") ?? "Sin Nombre";
+    String address = prefs.getString("address") ?? "Sin Dirección";
+    //bool res = _prefs.getBool("mayor") ?? true;
+    print(fullName);
+    print(address);
+    print(isDarkMode);
+    print(gender);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +62,7 @@ class _HomePageState extends State<HomePage> {
               height: 12.0,
             ),
             TextField(
+              controller: _fullNameController,
               decoration: InputDecoration(
                 hintText: "Nombre completo",
               ),
@@ -43,6 +71,7 @@ class _HomePageState extends State<HomePage> {
               height: 12.0,
             ),
             TextField(
+              controller: _addressController,
               decoration: InputDecoration(
                 hintText: "Dirección actual",
               ),
@@ -55,7 +84,7 @@ class _HomePageState extends State<HomePage> {
               value: isDarkMode,
               onChanged: (bool value) {
                 isDarkMode = value;
-                setState(() {}); //PARA REDIBUJAR
+                setState(() {});
               },
               title: Text("Dark mode"),
             ),
@@ -101,7 +130,10 @@ class _HomePageState extends State<HomePage> {
               height: 12.0,
             ),
             ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                saveSharedPreferences();
+                getSharedPreferences();
+              },
               icon: Icon(
                 Icons.save,
                 color: Colors.white,
